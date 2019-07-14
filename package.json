@@ -1,0 +1,18 @@
+{
+  "name": "toefl-neea-checker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "2captcha": "^1.0.11",
+    "await-sleep": "0.0.1",
+    "puppeteer": "^1.16.0",
+    "pushover-notifications": "^1.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
