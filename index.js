@@ -67,8 +67,9 @@ class Toefl {
                 get: () => false,
             });
         });
-        this.page.setDefaultNavigationTimeout(5000);
+        this.page.setDefaultNavigationTimeout(100000);
         this.page.setDefaultTimeout(5000);
+        await this.page.goto('http://toefl.neea.cn/', {waitUntil: 'networkidle0'});
     }
 
 
@@ -135,9 +136,10 @@ class Toefl {
 
 
 (async () => {
-    let DATES = ["2019-07-13", ];
-    // let CITIES = ["BEIJING", "HANGZHOU", "NINGBO", "TIANJIN", "SHANGHAI", "JINAN", "LINYI", "QINGDAO", "WEIFANG", "WEIHAI", "YANTAI", "DALIAN", "SHENYANG", "SHIJIAZHUANG", "HARBIN", "KAIFENG", "LUOYANG", "ZHENGZHOU"];
-    let CITIES = ["BEIJING", "TIANJIN", "SHIJIAZHUANG"];
+    let DATE_CITIES = [
+        ["2019-07-13", "BEIJING"], ["2019-07-13", "TIANJIN"], ["2019-07-13", "SHIJIAZHUANG"],
+    ];
+
     while(true) {
         let toefl = new Toefl();
         try {
@@ -146,33 +148,34 @@ class Toefl {
             await sleep(1000);
             while (true) {
                 let errCnt = 0;
-                for (let date of DATES) {
-                    for (let city of CITIES) {
-                        let available = false;
-                        try {
-                            available = await toefl.query_seat(city, date);
-                        } catch (e) {
-                            console.error(e);
-                            console.error('Query error');
-                            errCnt += 1;
-                        }
-                        // if (available) {
-                        //     pushover.send({
-                        //         message: `TOEFL ${city} ${date} AVAILABLE!`,
-                        //         priority: 1,
-                        //     }, function(err, result) {
-                        //         if (err) {
-                        //             console.error(err);
-                        //         }
-                        //         console.log(result);
-                        //     });
-                        // }
-                        await sleep(5000 + Math.random() * 5000);
+                for (let date_and_city of DATE_CITIES) {
+                    let date = date_and_city[0];
+                    let city = date_and_city[1];
+
+                    let available = false;
+                    try {
+                        available = await toefl.query_seat(city, date);
+                    } catch (e) {
+                        console.error(e);
+                        console.error('Query error');
+                        errCnt += 1;
                     }
+                    if (available) {
+                        pushover.send({
+                            message: `TOEFL ${city} ${date} AVAILABLE!`,
+                            priority: 1,
+                        }, function(err, result) {
+                            if (err) {
+                                console.error(err);
+                            }
+                            console.log(result);
+                        });
+                    }
+                    await sleep(3000 + Math.random() * 2000);
                     // await toefl.reopen_page();
                     // await sleep(2000);
                 }
-                if (errCnt * 2 > CITIES.length * DATES.length) {
+                if (errCnt * 2 > DATE_CITIES.length) {
                     throw new Error("TOO MUCH ERROR");
                 }
             }
