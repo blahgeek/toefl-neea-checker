@@ -115,6 +115,12 @@ class Toefl {
         const oldContent = await this.page.evaluate(() => {
             return document.querySelector('#qrySeatResult').textContent.trim();
         });
+
+        // WTF!
+        for (var i = 0 ; i < 100 ; i += 1)
+            await this.page.mouse.move(Math.random() * 100, Math.random() * 100);
+        await sleep(200);
+
         await this.page.click('#btnQuerySeat');
         await this.page.waitFor((oldContent) => {
             let newContent = document.querySelector('#qrySeatResult').textContent.trim();
